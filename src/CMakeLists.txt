@@ -28,7 +28,27 @@ endif()
 # ncurses
 
 if (IMTUI_SUPPORT_NCURSES)
-    add_library(imtui-ncurses ${IMTUI_LIBRARY_TYPE}
+
+    include_directories(../external/pdcurses/)
+
+    file(GLOB PDCURSES_INCLUDES ../external/pdcurses/pdcurses/*.h)
+    file(GLOB PDCURSES_SOURCES ../external/pdcurses/pdcurses/*.c)
+
+    file(GLOB WINCON_INCLUDES ../external/pdcurses/wincon/*.h)
+    file(GLOB WINCON_SOURCES ../external/pdcurses/wincon/*.c)
+
+    add_library(imtui-pdcurses STATIC
+        ${PDCURSES_INCLUDES}
+        ${PDCURSES_SOURCES}
+        ${WINCON_INCLUDES}
+        ${WINCON_SOURCES}
+        )
+
+    target_link_libraries(imtui-pdcurses PUBLIC
+        winmm
+        )
+
+    add_library(imtui-ncurses ${IMTUI_LIBRARY_TYPE} 
         imtui-impl-ncurses.cpp
         )
 
@@ -40,6 +60,7 @@ if (IMTUI_SUPPORT_NCURSES)
 
     target_link_libraries(imtui-ncurses PUBLIC
         imtui
+        imtui-pdcurses
         ${CURSES_LIBRARIES}
         )
 endif()

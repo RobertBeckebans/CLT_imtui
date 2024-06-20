@@ -8,7 +8,11 @@
 
 #ifdef _WIN32
 #define NCURSES_MOUSE_VERSION
-#include <pdcurses.h>
+//#include <pdcurses.h>
+extern "C"
+{
+#include "../external/pdcurses/curses.h"
+}
 #define set_escdelay(X)
 
 #define KEY_OFFSET 0xec00
@@ -283,6 +287,10 @@ static std::array<std::pair<bool, int>, 256*256> colPairs;
 
 void ImTui_ImplNcurses_DrawScreen(bool active) {
     if (active) nActiveFrames = 10;
+
+    // RB: added resize fix - see https://github.com/ggerganov/imtui/discussions/19
+    if (is_termresized())
+	resize_term(0, 0);
 
     wrefresh(stdscr);
 
